@@ -20,7 +20,7 @@ public class MyTaskJob implements StatefulJob {
     /*@Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         count++;
-        System.err.println("正在执行任务=="+count+"====="+new Date());
+        System.err.println("正在执行任务="+count+"====="+new Date());
     }*/
 
     @Override
