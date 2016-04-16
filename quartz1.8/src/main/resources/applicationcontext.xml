@@ -15,22 +15,60 @@
                 <entry key="timeout" value="0" />
             </map>
         </property>
+        <!--是否是易失性的job，程序关闭之后有状态的job jobDataAsMap不会被持久化,触发器必须也设置为这个属性-->
+        <!--<property name="volatility" value="true"></property>-->
+        <!--Job 持久性在所有的触发器触发之后JobDetail将从 JobStore 中移出。Job持久性默认值是false.Scheduler将移除没有trigger关联的jobDetail-->
+        <!--<property name="durability" value="true"></property>-->
+        <property name="description" value="job测试"></property>
+        <!--当一个Job在执行中，Scheduler非正常的关闭，设置JobDetail 的setRequestsRecovery(true) 在 Scheduler 重启之后可恢复的Job还会再次被执行。这个
+        Job 会重新开始执行。注意job代码事务特性.Job可恢复性默认为false，Scheduler不会试着去恢复job操作。-->
+        <property name="requestsRecovery" value="false"></property>
+
+        <property name="jobListenerNames">
+            <array>
+                <value>myjoblistener</value>
+            </array>
+        </property>
     </bean>
     <!--触发器-->
     <bean id="edayJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean" >
         <property name="jobDetail" ref="edayJobDetail" />
         <property name="cronExpression" value="0/5 * * * * ?" />
+        <!--是否是易失性的job，程序关闭之后jobDataAsMap不会被持久化-->
+        <!--<property name="volatility" value="true"></property>-->
+        <property name="description" value="触发器demo"></property>
+        <property name="triggerListenerNames">
+            <array>
+                <value>mytriggerlistener</value>
+            </array>
+        </property>
     </bean>
 	
 	<!-- quartz持久化存储 -->
 	<bean id="scheduler"
 		class="org.springframework.scheduling.quartz.SchedulerFactoryBean" autowire="no" lazy-init="false" >
 		<!-- <property name="configLocation" value="classpath:quartz.properties" /> -->
-		<!--<property name="triggers">
+		<property name="triggers">
             <list>
                 <ref bean="edayJobTrigger" ></ref>
             </list>
-        </property>-->
+        </property>
+
+        <property name="triggerListeners">
+            <bean class="xin.quartz.demo.listener.MyTriggerListener" ></bean>
+        </property>
+        <property name="jobListeners">
+            <array>
+                <bean class="xin.quartz.demo.listener.MyJobListener" ></bean>
+            </array>
+        </property>
+        <property name="schedulerListeners">
+            <list>
+                <bean class="xin.quartz.demo.listener.MySchedulerListenerSupport" ></bean>
+                <bean class="xin.quartz.demo.listener.MySchedulerListener"></bean>
+            </list>
+        </property>
+
 		<property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
 		<property name="autoStartup" value="true" />
 		<property name="schedulerName" value="xinDemoScheduler" />
@@ -55,7 +93,7 @@
                 <prop key="org.quartz.dataSource.quartzdb.driver">com.mysql.jdbc.Driver</prop>
                 <prop key="org.quartz.dataSource.quartzdb.URL">jdbc:mysql://127.0.0.1:3306/quartzdb?useUnicode=true&amp;characterEncoding=UTF-8</prop>
                 <prop key="org.quartz.dataSource.quartzdb.user">root</prop>
-                <prop key="org.quartz.dataSource.quartzdb.password">root</prop>
+                <prop key="org.quartz.dataSource.quartzdb.password">123456</prop>
                 <prop key="org.quartz.dataSource.quartzdb.maxConnections">5</prop>
 
                 <prop key="org.quartz.jobStore.isClustered">false</prop>
